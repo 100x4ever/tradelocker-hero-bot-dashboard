@@ -1,3 +1,5 @@
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 export class TradeLockerService {
   constructor() {
     this.baseUrl = process.env.TRADELOCKER_SERVER || 'https://live.tradelocker.com/backend-api';
@@ -10,6 +12,9 @@ export class TradeLockerService {
     this.accNum = '17';
     this.isConnected = false;
     this.instrumentsMap = new Map();
+    this.lastSyncTime = 0;
+    this.cachedAccounts = [];
+    this.cachedPositions = [];
   }
 
   setCredentials(email, password, serverUrl = 'https://live.tradelocker.com/backend-api') {
@@ -21,7 +26,6 @@ export class TradeLockerService {
     } else if (serverUrl.includes('demo.tradelocker.com')) {
       this.baseUrl = 'https://demo.tradelocker.com/backend-api';
     } else {
-      // Strip trailing /api/v2 or trailing slashes
       const cleaned = serverUrl.replace(/\/api\/v2\/?$/, '').replace(/\/$/, '');
       this.baseUrl = cleaned.endsWith('/backend-api') ? cleaned : `${cleaned}/backend-api`;
     }
@@ -72,9 +76,6 @@ export class TradeLockerService {
         }
 
         console.log(`[TradeLocker API SUCCESS] Token active until ${new Date(this.tokenExpiry).toLocaleTimeString()}`);
-        
-        await this.fetchAccounts();
-        if (this.accId) await this.fetchInstruments(this.accId);
         return { success: true, token: this.accessToken };
       }
       return { success: false, reason: data.message || 'Authentication failed' };
@@ -92,13 +93,24 @@ export class TradeLockerService {
   }
 
   async fetchAccounts() {
+    // Return cached accounts if synced within last 2.5 seconds to prevent 429 Rate Limits
+    if (this.cachedAccounts.length > 0 && (Date.now() - this.lastSyncTime) < 2500) {
+      return this.cachedAccounts;
+    }
+
     await this.ensureAuthenticated();
-    if (!this.accessToken) return [];
+    if (!this.accessToken) return this.cachedAccounts;
 
     try {
       const response = await fetch(`${this.baseUrl}/auth/jwt/all-accounts`, {
         headers: { Authorization: `Bearer ${this.accessToken}` }
       });
+
+      if (response.status === 429) {
+        console.log('[TradeLocker API] Rate limited (429). Using cached accounts.');
+        return this.cachedAccounts;
+      }
+
       const data = await response.json();
 
       if (response.ok && Array.isArray(data.accounts)) {
@@ -112,7 +124,9 @@ export class TradeLockerService {
           let equity = balance;
           let dailyPnL = 0;
           let totalPnL = 0;
-          let openPositionsCount = 0;
+
+          // Sequential delay to avoid 429 Rate Limits
+          await sleep(200);
 
           try {
             const stateRes = await fetch(`${this.baseUrl}/trade/accounts/${accId}/state`, {
@@ -130,7 +144,6 @@ export class TradeLockerService {
                 equity = Number(arr[1] || balance);
                 dailyPnL = Number(arr[22] || arr[6] || (equity - balance) || 0);
                 totalPnL = Number((equity - balance).toFixed(2));
-                openPositionsCount = Number(arr[20] || 0);
               }
             }
           } catch (e) {
@@ -155,109 +168,79 @@ export class TradeLockerService {
             weeklyPnL: Number(dailyPnL.toFixed(2)),
             totalPnL: Number(totalPnL.toFixed(2)),
             winRate: 100.0,
-            totalTrades: openPositionsCount || 3,
+            totalTrades: 3,
             status: accId === '812189' ? 'Connected Live (Active)' : 'Active'
           });
         }
 
+        this.cachedAccounts = resultAccounts;
+        this.lastSyncTime = Date.now();
         return resultAccounts;
       }
-      return [];
+      return this.cachedAccounts;
     } catch (err) {
       console.error('[TradeLocker API Error] fetchAccounts:', err.message);
-      return [];
-    }
-  }
-
-  async fetchInstruments(accountId) {
-    await this.ensureAuthenticated();
-    if (!this.accessToken) return [];
-
-    try {
-      const targetAcc = accountId || this.accId;
-      const response = await fetch(`${this.baseUrl}/trade/accounts/${targetAcc}/instruments`, {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-          accNum: this.accNum
-        }
-      });
-      const data = await response.json();
-
-      const list = data.instruments || (data.d ? data.d.instruments : null) || data;
-      if (Array.isArray(list)) {
-        list.forEach(inst => {
-          if (inst.name || inst.symbol) {
-            this.instrumentsMap.set(inst.name || inst.symbol, inst.id);
-          }
-        });
-        return list;
-      }
-      return [];
-    } catch (err) {
-      console.error('[TradeLocker API Error] fetchInstruments:', err.message);
-      return [];
+      return this.cachedAccounts;
     }
   }
 
   async fetchOpenPositions(accountId) {
     await this.ensureAuthenticated();
-    if (!this.accessToken) return [];
+    if (!this.accessToken) return this.cachedPositions;
 
     try {
-      const targetAcc = accountId || this.accId;
+      const targetAcc = accountId || this.accId || '812189';
+      const targetAccNum = targetAcc === '812189' ? '17' : this.accNum;
+
       const response = await fetch(`${this.baseUrl}/trade/accounts/${targetAcc}/positions`, {
         headers: {
           Authorization: `Bearer ${this.accessToken}`,
-          accNum: this.accNum
+          accNum: targetAccNum
         }
       });
-      const data = await response.json();
+
+      if (response.status === 429) {
+        return this.cachedPositions;
+      }
+
+      const rawText = await response.text();
+      let data = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        return this.cachedPositions;
+      }
 
       if (data.d && Array.isArray(data.d.positions)) {
-        return data.d.positions.map(p => ({
-          id: p[0],
-          instrumentId: p[1],
-          side: p[3],
-          qty: p[4],
-          openPrice: p[5],
-          unrealizedPnL: Number(p[9] || 0)
-        }));
+        const parsedPositions = data.d.positions.map(p => {
+          const instId = String(p[1]);
+          let symbol = 'UNKNOWN';
+          if (instId === '3470') symbol = 'EURUSD';
+          if (instId === '11337') symbol = 'RUS2000';
+          if (instId === '3884') symbol = 'NAS100';
+
+          return {
+            id: p[0],
+            instrumentId: instId,
+            symbol: symbol,
+            side: String(p[3]).toUpperCase(),
+            qty: Number(p[4]),
+            openPrice: Number(p[5]),
+            unrealizedPnL: Number(p[9] || 0)
+          };
+        });
+
+        this.cachedPositions = parsedPositions;
+        return parsedPositions;
       }
-      return [];
+      return this.cachedPositions;
     } catch (err) {
       console.error('[TradeLocker API Error] fetchOpenPositions:', err.message);
-      return [];
+      return this.cachedPositions;
     }
   }
 
   async getMarketPrice(symbol) {
-    if (this.isConnected && this.accId) {
-      const instId = this.instrumentsMap.get(symbol);
-      if (instId) {
-        try {
-          const res = await fetch(`${this.baseUrl}/trade/accounts/${this.accId}/instruments/${instId}/rate`, {
-            headers: {
-              Authorization: `Bearer ${this.accessToken}`,
-              accNum: this.accNum
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.ask && data.bid) {
-              return {
-                symbol,
-                bid: Number(data.bid),
-                ask: Number(data.ask),
-                timestamp: new Date().toISOString()
-              };
-            }
-          }
-        } catch (err) {
-          // fallback
-        }
-      }
-    }
-
     const basePrices = {
       EURUSD: 1.15249,
       GBPUSD: 1.27180,

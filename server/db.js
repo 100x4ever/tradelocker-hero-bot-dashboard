@@ -17,11 +17,11 @@ const defaultData = {
       accNumber: '812189',
       type: 'Live',
       server: 'https://live.tradelocker.com',
-      balance: 1000.00,
-      equity: 1000.93,
-      dailyPnL: 0.93,
-      weeklyPnL: 0.93,
-      totalPnL: 0.93,
+      balance: 999.75,
+      equity: 1000.54,
+      dailyPnL: 0.79,
+      weeklyPnL: 0.79,
+      totalPnL: 0.79,
       winRate: 100.0,
       totalTrades: 3,
       status: 'Connected Live (HeroFX API Active)'
@@ -35,7 +35,7 @@ const defaultData = {
       timeframe: '15m',
       lotSize: 0.01,
       enabled: true,
-      totalPnL: 0.14,
+      totalPnL: -0.15,
       winCount: 1,
       lossCount: 0,
       winRate: 100.0,
@@ -55,7 +55,7 @@ const defaultData = {
       timeframe: '15m',
       lotSize: 0.10,
       enabled: true,
-      totalPnL: 0.08,
+      totalPnL: 0.07,
       winCount: 1,
       lossCount: 0,
       winRate: 100.0,
@@ -75,7 +75,7 @@ const defaultData = {
       timeframe: '15m',
       lotSize: 0.01,
       enabled: true,
-      totalPnL: 0.71,
+      totalPnL: 0.87,
       winCount: 1,
       lossCount: 0,
       winRate: 100.0,
@@ -102,10 +102,10 @@ const defaultData = {
       sl: null,
       tp: null,
       lotSize: 0.01,
-      pnl: 0.71,
+      pnl: 0.87,
       session: 'New York',
       rsi: 62.4,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     },
     {
       id: 'scen-812189-2',
@@ -119,10 +119,10 @@ const defaultData = {
       sl: null,
       tp: null,
       lotSize: 0.10,
-      pnl: 0.08,
+      pnl: 0.07,
       session: 'New York',
       rsi: 58.1,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     },
     {
       id: 'scen-812189-3',
@@ -136,10 +136,10 @@ const defaultData = {
       sl: null,
       tp: null,
       lotSize: 0.01,
-      pnl: 0.14,
+      pnl: -0.15,
       session: 'London',
       rsi: 42.5,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     }
   ],
   logs: [
@@ -197,40 +197,26 @@ class DataStore {
         // Query live positions from TradeLocker
         const positions = await tradeLockerService.fetchOpenPositions(targetAcc.id || '812189');
         
-        // Map instrument IDs to symbols and PnL
         let totalFloatingPnL = 0;
-        const assetPnLs = {
-          '3470': { symbol: 'EURUSD', pnl: 0.14 },
-          '11337': { symbol: 'RUS2000', pnl: 0.08 },
-          '3884': { symbol: 'NAS100', pnl: 0.71 }
-        };
+        const liveAssetPnLs = {};
 
         if (Array.isArray(positions) && positions.length > 0) {
           positions.forEach(pos => {
-            const instId = String(pos.instrumentId);
+            const symbol = pos.symbol || (pos.instrumentId === '3470' ? 'EURUSD' : pos.instrumentId === '11337' ? 'RUS2000' : 'NAS100');
             const pnl = Number(pos.unrealizedPnL || 0);
             totalFloatingPnL += pnl;
+            liveAssetPnLs[symbol] = pnl;
+          });
 
-            if (assetPnLs[instId]) {
-              assetPnLs[instId].pnl = pnl;
+          // Sync Asset PnLs dynamically from TradeLocker positions
+          this.data.assets.forEach(asset => {
+            if (liveAssetPnLs[asset.symbol] !== undefined) {
+              asset.totalPnL = liveAssetPnLs[asset.symbol];
             }
           });
-        } else {
-          totalFloatingPnL = 0.93; // 0.14 + 0.08 + 0.71
         }
 
-        // Synchronize asset total PnL cleanly from live positions
-        const eurusd = this.data.assets.find(a => a.symbol === 'EURUSD');
-        if (eurusd) { eurusd.totalPnL = assetPnLs['3470'].pnl; eurusd.winCount = 1; eurusd.lossCount = 0; eurusd.winRate = 100.0; }
-
-        const rus2000 = this.data.assets.find(a => a.symbol === 'RUS2000');
-        if (rus2000) { rus2000.totalPnL = assetPnLs['11337'].pnl; rus2000.winCount = 1; rus2000.lossCount = 0; rus2000.winRate = 100.0; }
-
-        const nas100 = this.data.assets.find(a => a.symbol === 'NAS100');
-        if (nas100) { nas100.totalPnL = assetPnLs['3884'].pnl; nas100.winCount = 1; nas100.lossCount = 0; nas100.winRate = 100.0; }
-
-        // Align account balance & equity mathematically
-        const balance = targetAcc.balance || 1000.00;
+        const balance = targetAcc.balance > 0 ? targetAcc.balance : 999.75;
         const floatingPnL = Number(totalFloatingPnL.toFixed(2));
         const equity = Number((balance + floatingPnL).toFixed(2));
 
