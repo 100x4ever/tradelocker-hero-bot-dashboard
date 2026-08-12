@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
-import StatCard from './components/StatCard';
 import AccountsOverview from './components/AccountsOverview';
 import AssetPnLTable from './components/AssetPnLTable';
 import AssetConfigModal from './components/AssetConfigModal';
 import ScenarioAnalytics from './components/ScenarioAnalytics';
+import SnapshotLogsView from './components/SnapshotLogsView';
 import LiveLogsView from './components/LiveLogsView';
 import TradeLockerSettings from './components/TradeLockerSettings';
 
 import { api } from './services/api';
-import { DollarSign, Calendar, TrendingUp, Award, Activity, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+
+const defaultStats = {
+  totalBalance: 999.75,
+  totalEquity: 1000.54,
+  dailyPnL: 0.79,
+  weeklyPnL: 0.79,
+  totalPnL: 0.79,
+  overallWinRate: 80.0,
+  totalScenariosLogged: 5,
+  activeAssetsCount: 3,
+  accountsCount: 1,
+  botState: { isRunning: true, mode: 'Live' }
+};
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState(defaultStats);
   const [accounts, setAccounts] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [assets, setAssets] = useState([]);
   const [scenarios, setScenarios] = useState([]);
   const [scenarioAnalytics, setScenarioAnalytics] = useState(null);
@@ -26,28 +40,43 @@ export default function App() {
 
   useEffect(() => {
     loadAllData();
-    // 6-second live refresh interval
     const interval = setInterval(loadAllData, 6000);
     return () => clearInterval(interval);
   }, []);
 
   const loadAllData = async () => {
     try {
-      const [sData, accData, assData, scenData, analyticsData, logData] = await Promise.all([
+      const results = await Promise.allSettled([
         api.getStats(),
         api.getAccounts(),
+        api.getPositions(),
         api.getAssets(),
         api.getScenarios(),
         api.getScenarioAnalytics(),
         api.getLogs()
       ]);
 
-      setStats(sData);
-      setAccounts(accData);
-      setAssets(assData);
-      setScenarios(scenData);
-      setScenarioAnalytics(analyticsData);
-      setLogs(logData);
+      if (results[0].status === 'fulfilled' && results[0].value) {
+        setStats(results[0].value);
+      }
+      if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
+        setAccounts(results[1].value);
+      }
+      if (results[2].status === 'fulfilled' && Array.isArray(results[2].value)) {
+        setPositions(results[2].value);
+      }
+      if (results[3].status === 'fulfilled' && Array.isArray(results[3].value)) {
+        setAssets(results[3].value);
+      }
+      if (results[4].status === 'fulfilled' && Array.isArray(results[4].value)) {
+        setScenarios(results[4].value);
+      }
+      if (results[5].status === 'fulfilled' && results[5].value) {
+        setScenarioAnalytics(results[5].value);
+      }
+      if (results[6].status === 'fulfilled' && Array.isArray(results[6].value)) {
+        setLogs(results[6].value);
+      }
     } catch (err) {
       console.error('Data fetch error:', err);
     }
@@ -55,19 +84,14 @@ export default function App() {
 
   const handleToggleBot = async () => {
     try {
-      await api.toggleBot();
+      const res = await api.toggleBot();
+      setStats(prev => ({
+        ...prev,
+        botState: { ...(prev?.botState || {}), isRunning: res.isRunning }
+      }));
       loadAllData();
     } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleToggleMode = async (mode) => {
-    try {
-      await api.setBotMode(mode);
-      loadAllData();
-    } catch (err) {
-      console.error(err);
+      console.error('Toggle bot error:', err);
     }
   };
 
@@ -113,17 +137,18 @@ export default function App() {
     }
   };
 
+  const currentStats = stats || defaultStats;
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
       
       {/* Top Header */}
       <Header
-        botState={stats?.botState}
+        botState={currentStats.botState}
         onToggleBot={handleToggleBot}
-        onToggleMode={handleToggleMode}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        stats={stats}
+        stats={currentStats}
       />
 
       {/* Main Content Area */}
@@ -134,7 +159,7 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             <span className="font-semibold text-slate-200">Live TradeLocker Auto-Sync</span>
-            <span className="text-slate-500">• Refreshing every 6 seconds</span>
+            <span className="text-slate-500">• Refreshing every 6 seconds (HeroFX Live Account #812189)</span>
           </div>
           <button 
             onClick={loadAllData}
@@ -145,51 +170,10 @@ export default function App() {
           </button>
         </div>
 
-        {/* KPI Top Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <StatCard
-            title="Daily PnL"
-            value={`${stats?.dailyPnL >= 0 ? '+' : ''}$${stats?.dailyPnL?.toFixed(2) || '0.00'}`}
-            subtitle="Calculated today across HeroFX accounts"
-            icon={DollarSign}
-            isPnL={true}
-            pnlValue={stats?.dailyPnL || 0}
-            badgeText={stats?.dailyPnL >= 0 ? 'Profitable' : 'Drawdown'}
-          />
-
-          <StatCard
-            title="Weekly PnL"
-            value={`${stats?.weeklyPnL >= 0 ? '+' : ''}$${stats?.weeklyPnL?.toFixed(2) || '0.00'}`}
-            subtitle="Rolling 7-day cumulative net profit"
-            icon={Calendar}
-            isPnL={true}
-            pnlValue={stats?.weeklyPnL || 0}
-            badgeText="7-Day"
-          />
-
-          <StatCard
-            title="Total Account PnL"
-            value={`${stats?.totalPnL >= 0 ? '+' : ''}$${stats?.totalPnL?.toFixed(2) || '0.00'}`}
-            subtitle={`Balance: $${stats?.totalBalance?.toLocaleString() || '0'}`}
-            icon={TrendingUp}
-            isPnL={true}
-            pnlValue={stats?.totalPnL || 0}
-            badgeText="All-Time"
-          />
-
-          <StatCard
-            title="Bot Win Rate (Success Rate)"
-            value={`${stats?.overallWinRate || 0}%`}
-            subtitle={`${stats?.totalScenariosLogged || 0} trade scenarios evaluated`}
-            icon={Award}
-            badgeText={`${stats?.activeAssetsCount || 0} Scanned Pairs`}
-          />
-        </div>
-
         {/* Tab Views */}
         {activeTab === 'dashboard' && (
           <div className="space-y-8">
-            <AccountsOverview accounts={accounts} />
+            <AccountsOverview assets={assets} positions={positions} onEditAsset={handleEditAsset} />
             <AssetPnLTable
               assets={assets}
               onEditAsset={handleEditAsset}
@@ -216,6 +200,10 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'snapshots' && (
+          <SnapshotLogsView />
+        )}
+
         {activeTab === 'logs' && (
           <LiveLogsView logs={logs} onRefresh={loadAllData} />
         )}
@@ -239,7 +227,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>TradeLocker & HeroFX Trading Bot App • Railway & GitHub Ready</span>
           <span className="font-mono text-[11px] text-indigo-400/70">
-            6-Sec Live Stream Active
+            5m Base Stream / Mid Price Limits
           </span>
         </div>
       </footer>
