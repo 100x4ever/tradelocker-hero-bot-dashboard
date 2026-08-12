@@ -9,7 +9,7 @@ import LiveLogsView from './components/LiveLogsView';
 import TradeLockerSettings from './components/TradeLockerSettings';
 
 import { api } from './services/api';
-import { DollarSign, Calendar, TrendingUp, Award, Layers, Sparkles } from 'lucide-react';
+import { DollarSign, Calendar, TrendingUp, Award, Activity, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,6 +19,7 @@ export default function App() {
   const [scenarios, setScenarios] = useState([]);
   const [scenarioAnalytics, setScenarioAnalytics] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [positions, setPositions] = useState([]);
 
   // Asset Config Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,8 @@ export default function App() {
 
   useEffect(() => {
     loadAllData();
-    const interval = setInterval(loadAllData, 5000);
+    // Fast 3-second live refresh interval
+    const interval = setInterval(loadAllData, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -128,6 +130,22 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-8">
         
+        {/* Live Refresh Badge */}
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span className="font-semibold text-slate-200">Live TradeLocker Auto-Sync</span>
+            <span className="text-slate-500">• Refreshing every 3 seconds</span>
+          </div>
+          <button 
+            onClick={loadAllData}
+            className="p-1 px-2.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition-colors flex items-center space-x-1"
+          >
+            <RefreshCw className="w-3 h-3 text-indigo-400" />
+            <span>Sync Now</span>
+          </button>
+        </div>
+
         {/* KPI Top Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <StatCard
@@ -222,7 +240,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>TradeLocker & HeroFX Trading Bot App • Railway & GitHub Ready</span>
           <span className="font-mono text-[11px] text-indigo-400/70">
-            Persistent Scenario Engine Active
+            3-Sec Live Stream Active
           </span>
         </div>
       </footer>
