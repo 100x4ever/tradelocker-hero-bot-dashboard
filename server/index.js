@@ -1,7 +1,7 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath, parse as parseUrl } from 'url';
+import { fileURLToPath } from 'url';
 
 import { db } from './db.js';
 import { botEngine } from './botEngine.js';
@@ -12,7 +12,6 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 5000;
 
-// Content types for serving frontend static files
 const MIME_TYPES = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -50,7 +49,6 @@ function parseBody(req) {
 }
 
 const server = http.createServer(async (req, res) => {
-  // CORS Preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
@@ -64,15 +62,15 @@ const server = http.createServer(async (req, res) => {
   const pathname = reqUrl.pathname;
   const query = Object.fromEntries(reqUrl.searchParams.entries());
 
-  // --- REST API ENDPOINTS ---
-
   // Health Check
   if (pathname === '/health') {
     return sendJSON(res, { status: 'ok', timestamp: new Date().toISOString() });
   }
 
-  // GET /api/stats
+  // GET /api/stats (Syncs with real TradeLocker account state)
   if (pathname === '/api/stats' && req.method === 'GET') {
+    await db.syncLiveAccounts();
+
     const accounts = db.getAccounts();
     const assets = db.getAssets();
     const scenarios = db.getScenarios();
@@ -85,7 +83,9 @@ const server = http.createServer(async (req, res) => {
 
     const closedScenarios = scenarios.filter(s => ['CLOSED_WIN', 'CLOSED_LOSS'].includes(s.status));
     const wins = closedScenarios.filter(s => s.status === 'CLOSED_WIN').length;
-    const overallWinRate = closedScenarios.length > 0 ? Number(((wins / closedScenarios.length) * 100).toFixed(1)) : 70.0;
+    const overallWinRate = closedScenarios.length > 0 
+      ? Number(((wins / closedScenarios.length) * 100).toFixed(1)) 
+      : (accounts[0]?.winRate || 0);
 
     return sendJSON(res, {
       totalBalance: Number(totalBalance.toFixed(2)),
@@ -103,6 +103,7 @@ const server = http.createServer(async (req, res) => {
 
   // GET /api/accounts
   if (pathname === '/api/accounts' && req.method === 'GET') {
+    await db.syncLiveAccounts();
     return sendJSON(res, db.getAccounts());
   }
 
@@ -274,7 +275,7 @@ const server = http.createServer(async (req, res) => {
       isConnected: tradeLockerService.isConnected,
       baseUrl: tradeLockerService.baseUrl,
       email: tradeLockerService.email ? `${tradeLockerService.email.substring(0, 3)}***` : 'Not Set',
-      accId: tradeLockerService.accId || 'Default Demo'
+      accId: tradeLockerService.accId || 'Not Connected'
     });
   }
 
@@ -284,8 +285,9 @@ const server = http.createServer(async (req, res) => {
     tradeLockerService.setCredentials(body.email, body.password, body.serverUrl);
     const result = await tradeLockerService.authenticate();
     if (result.success) {
-      db.addLog('INFO', 'Authenticated with TradeLocker HeroFX API');
-      return sendJSON(res, { success: true, message: 'Connected to TradeLocker API successfully!' });
+      await db.syncLiveAccounts();
+      db.addLog('INFO', 'Successfully authenticated with TradeLocker HeroFX API');
+      return sendJSON(res, { success: true, message: 'Connected to TradeLocker API successfully! Live account synced.' });
     }
     return sendJSON(res, { success: false, error: result.reason || 'Auth failed' }, 401);
   }
@@ -294,7 +296,6 @@ const server = http.createServer(async (req, res) => {
   let filePath = path.join(__dirname, '../dist', pathname === '/' ? 'index.html' : pathname);
   
   if (!fs.existsSync(filePath)) {
-    // SPA Fallback to index.html or root index.html
     filePath = path.join(__dirname, '../index.html');
   }
 
@@ -315,11 +316,18 @@ const server = http.createServer(async (req, res) => {
   res.end('Not Found');
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`=======================================================`);
   console.log(`🚀 TradeLocker Bot & Dashboard Server running on port ${PORT}`);
   console.log(`🌐 Local UI: http://localhost:${PORT}`);
   console.log(`=======================================================`);
+
+  // Auto-connect if environment variables are provided
+  if (process.env.TRADELOCKER_EMAIL && process.env.TRADELOCKER_PASSWORD) {
+    console.log('[TradeLocker API] Authenticating with provided environment credentials...');
+    await tradeLockerService.authenticate();
+    await db.syncLiveAccounts();
+  }
 
   // Start background trading scanner bot
   botEngine.start();
