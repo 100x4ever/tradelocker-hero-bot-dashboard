@@ -11,10 +11,10 @@ const DB_FILE = path.join(__dirname, 'data_store.json');
 const defaultData = {
   accounts: [
     {
-      id: 'herofx-live-812189',
-      name: 'HeroFX Live Account',
+      id: '812189',
+      name: 'HeroFX Live Account (812189)',
       broker: 'HeroFX (TradeLocker)',
-      accNumber: 'L#812189',
+      accNumber: '812189',
       type: 'Live',
       server: 'https://live.tradelocker.com/api/v2',
       balance: 0.00,
@@ -24,7 +24,7 @@ const defaultData = {
       totalPnL: 0.00,
       winRate: 0.0,
       totalTrades: 0,
-      status: 'Awaiting Live HeroFX Credentials'
+      status: 'Authenticating with HeroFX Live API...'
     }
   ],
   assets: [
@@ -115,8 +115,8 @@ const defaultData = {
       id: 1,
       timestamp: new Date().toISOString(),
       level: 'INFO',
-      message: 'System ready for HeroFX Live account L#812189. Enter email/password in Settings.',
-      details: 'TradeLocker REST API Client active.'
+      message: 'Authenticating with HeroFX Live Account 812189 (jcollins92989@gmail.com)...',
+      details: 'TradeLocker REST API Engine'
     }
   ],
   botState: {
@@ -137,7 +137,17 @@ class DataStore {
     try {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
-        this.data = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        
+        // If data contains old mock accounts, overwrite with clean live account template
+        const hasMockData = parsed.accounts?.some(a => a.balance === 10450.8 || a.balance === 25800);
+        if (hasMockData) {
+          console.log('[DB Reset] Clearing legacy mock data store in favor of live account 812189...');
+          this.data = defaultData;
+          this.save();
+        } else {
+          this.data = parsed;
+        }
       } else {
         this.save();
       }
@@ -162,6 +172,17 @@ class DataStore {
         this.data.accounts = realAccounts;
         this.save();
         return realAccounts;
+      }
+    } else {
+      // Attempt auth if disconnected
+      const auth = await tradeLockerService.authenticate();
+      if (auth.success) {
+        const realAccounts = await tradeLockerService.fetchAccounts();
+        if (realAccounts && realAccounts.length > 0) {
+          this.data.accounts = realAccounts;
+          this.save();
+          return realAccounts;
+        }
       }
     }
     return this.data.accounts;

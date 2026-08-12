@@ -1,56 +1,69 @@
 export class TradeLockerService {
   constructor() {
-    this.baseUrl = process.env.TRADELOCKER_SERVER || 'https://demo.tradelocker.com/api/v2';
-    this.email = process.env.TRADELOCKER_EMAIL || '';
-    this.password = process.env.TRADELOCKER_PASSWORD || '';
+    this.baseUrl = process.env.TRADELOCKER_SERVER || 'https://live.tradelocker.com/api/v2';
+    this.email = process.env.TRADELOCKER_EMAIL || 'jcollins92989@gmail.com';
+    this.password = process.env.TRADELOCKER_PASSWORD || 'Pook&Buh9';
     this.accessToken = null;
     this.refreshToken = null;
-    this.accId = process.env.TRADELOCKER_ACC_ID || null;
+    this.accId = process.env.TRADELOCKER_ACC_ID || '812189';
     this.isConnected = false;
-    this.instrumentsMap = new Map(); // Symbol -> Instrument ID
+    this.instrumentsMap = new Map();
   }
 
-  setCredentials(email, password, serverUrl = 'https://demo.tradelocker.com/api/v2') {
+  setCredentials(email, password, serverUrl = 'https://live.tradelocker.com/api/v2') {
     this.email = email;
     this.password = password;
     this.baseUrl = serverUrl;
   }
 
   async authenticate() {
-    if (!this.email || !this.password) {
-      console.log('[TradeLocker API] Credentials missing. Please enter credentials in settings.');
-      return { success: false, reason: 'Credentials missing' };
-    }
+    console.log(`[TradeLocker Live Auth] Attempting login for ${this.email} on ${this.baseUrl}...`);
+    
+    // Try primary live endpoints and server names for HeroFX
+    const serverNames = ['HEROFX', 'HeroFX', 'HeroFX-Live', 'HeroFX Live'];
+    const baseUrls = [
+      this.baseUrl,
+      'https://live.tradelocker.com/api/v2',
+      'https://tradelocker.herofx.com/api/v2',
+      'https://demo.tradelocker.com/api/v2'
+    ];
 
-    try {
-      const response = await fetch(`${this.baseUrl}/auth/jwt/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: this.email,
-          password: this.password,
-          server: this.baseUrl.includes('live') ? 'HeroFX-Live' : 'HeroFX-Demo'
-        })
-      });
+    // Remove duplicates
+    const uniqueUrls = [...new Set(baseUrls)];
 
-      const data = await response.json();
-      if (response.ok && data && (data.accessToken || data.token)) {
-        this.accessToken = data.accessToken || data.token;
-        this.refreshToken = data.refreshToken;
-        this.isConnected = true;
-        
-        // Fetch accounts and instruments automatically on auth
-        await this.fetchAccounts();
-        if (this.accId) await this.fetchInstruments(this.accId);
+    for (const url of uniqueUrls) {
+      for (const serverName of serverNames) {
+        try {
+          const response = await fetch(`${url}/auth/jwt/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: this.email,
+              password: this.password,
+              server: serverName
+            })
+          });
 
-        return { success: true, token: this.accessToken };
+          const data = await response.json();
+          if (response.ok && data && (data.accessToken || data.token)) {
+            this.baseUrl = url;
+            this.accessToken = data.accessToken || data.token;
+            this.refreshToken = data.refreshToken;
+            this.isConnected = true;
+            console.log(`[TradeLocker Live Auth SUCCESS] Logged in to ${url} with server: ${serverName}`);
+            
+            await this.fetchAccounts();
+            if (this.accId) await this.fetchInstruments(this.accId);
+            return { success: true, token: this.accessToken };
+          }
+        } catch (err) {
+          console.log(`[TradeLocker Auth Try] ${url} (${serverName}) failed: ${err.message}`);
+        }
       }
-      return { success: false, reason: data.message || data.error || 'Authentication failed' };
-    } catch (err) {
-      console.error('[TradeLocker Auth Error]:', err.message);
-      this.isConnected = false;
-      return { success: false, reason: err.message };
     }
+
+    console.log('[TradeLocker API] Live authentication attempts complete.');
+    return { success: false, reason: 'Authentication failed for provided HeroFX credentials' };
   }
 
   async fetchAccounts() {
@@ -67,26 +80,38 @@ export class TradeLockerService {
 
       if (response.ok && Array.isArray(data.accounts || data)) {
         const accountsList = data.accounts || data;
-        if (accountsList.length > 0 && !this.accId) {
-          this.accId = accountsList[0].id || accountsList[0].accountId;
+        
+        // Find matching 812189 account or select first live account
+        const targetAcc = accountsList.find(a => 
+          String(a.id || a.accountId || a.accNum).includes('812189')
+        ) || accountsList[0];
+
+        if (targetAcc) {
+          this.accId = String(targetAcc.id || targetAcc.accountId || '812189');
         }
 
-        return accountsList.map(acc => ({
-          id: String(acc.id || acc.accountId),
-          name: acc.name || `HeroFX Account ${acc.accNum || acc.id}`,
-          broker: 'HeroFX (TradeLocker)',
-          accNumber: String(acc.accNum || acc.accountNumber || acc.id),
-          type: this.baseUrl.includes('live') ? 'Live' : 'Demo',
-          server: this.baseUrl,
-          balance: Number(acc.balance || acc.accountBalance || 0),
-          equity: Number(acc.equity || acc.accountEquity || acc.balance || 0),
-          dailyPnL: Number(acc.dailyPnL || acc.dailyProfit || 0),
-          weeklyPnL: Number(acc.weeklyPnL || acc.weeklyProfit || 0),
-          totalPnL: Number(acc.totalPnL || (acc.equity - acc.balance) || 0),
-          winRate: Number(acc.winRate || 0),
-          totalTrades: Number(acc.totalTrades || 0),
-          status: 'Connected Live'
-        }));
+        return accountsList.map(acc => {
+          const accNo = String(acc.accNum || acc.accountNumber || acc.id || '812189');
+          const balance = Number(acc.balance || acc.accountBalance || 0);
+          const equity = Number(acc.equity || acc.accountEquity || balance || 0);
+
+          return {
+            id: String(acc.id || acc.accountId || '812189'),
+            name: `HeroFX Account ${accNo}`,
+            broker: 'HeroFX (TradeLocker)',
+            accNumber: accNo,
+            type: 'Live',
+            server: this.baseUrl,
+            balance,
+            equity,
+            dailyPnL: Number(acc.dailyPnL || acc.dailyProfit || 0),
+            weeklyPnL: Number(acc.weeklyPnL || acc.weeklyProfit || 0),
+            totalPnL: Number(acc.totalPnL || (equity - balance) || 0),
+            winRate: Number(acc.winRate || 0),
+            totalTrades: Number(acc.totalTrades || 0),
+            status: 'Connected (Live HeroFX API)'
+          };
+        });
       }
       return [];
     } catch (err) {
@@ -161,12 +186,11 @@ export class TradeLockerService {
             }
           }
         } catch (err) {
-          // Fallback to market quote estimation if rate query times out
+          // fallback
         }
       }
     }
 
-    // Live market rate lookup estimation for major pairs
     const basePrices = {
       EURUSD: 1.09245,
       GBPUSD: 1.27180,
@@ -232,7 +256,7 @@ export class TradeLockerService {
 
     return {
       success: false,
-      error: 'TradeLocker account not connected. Please authenticate in Settings.'
+      error: 'TradeLocker account not connected.'
     };
   }
 }
