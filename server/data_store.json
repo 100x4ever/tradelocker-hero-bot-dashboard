@@ -1,0 +1,1529 @@
+{
+  "accounts": [
+    {
+      "id": "herofx-demo-101",
+      "name": "HeroFX TradeLocker Demo",
+      "broker": "HeroFX (TradeLocker)",
+      "accNumber": "8849201",
+      "type": "Demo",
+      "server": "https://demo.tradelocker.com/api/v2",
+      "balance": 10450.8,
+      "equity": 10620.4,
+      "dailyPnL": 310.5,
+      "weeklyPnL": 840.2,
+      "totalPnL": 1620.4,
+      "winRate": 68.4,
+      "totalTrades": 38,
+      "status": "Connected"
+    },
+    {
+      "id": "herofx-live-002",
+      "name": "HeroFX Live Account",
+      "broker": "HeroFX (TradeLocker)",
+      "accNumber": "9920154",
+      "type": "Live",
+      "server": "https://live.tradelocker.com/api/v2",
+      "balance": 25800,
+      "equity": 26145.25,
+      "dailyPnL": 145.25,
+      "weeklyPnL": 1250,
+      "totalPnL": 3450,
+      "winRate": 72.5,
+      "totalTrades": 52,
+      "status": "Simulation Mode"
+    }
+  ],
+  "assets": [
+    {
+      "id": "eurusd",
+      "symbol": "EURUSD",
+      "name": "Euro / US Dollar",
+      "timeframe": "15m",
+      "lotSize": 0.5,
+      "enabled": true,
+      "totalPnL": 1153.64,
+      "winCount": 17,
+      "lossCount": 4,
+      "winRate": 81,
+      "strategy": "EMA & RSI Momentum",
+      "rsiPeriod": 14,
+      "emaFast": 9,
+      "emaSlow": 21,
+      "tpPips": 25,
+      "slPips": 15,
+      "lastScanPrice": 1.09199,
+      "lastScanTime": "2026-08-12T19:57:56.329Z"
+    },
+    {
+      "id": "gbpusd",
+      "symbol": "GBPUSD",
+      "name": "British Pound / US Dollar",
+      "timeframe": "1h",
+      "lotSize": 0.25,
+      "enabled": true,
+      "totalPnL": 874.09,
+      "winCount": 14,
+      "lossCount": 3,
+      "winRate": 82.4,
+      "strategy": "Breakout & Trend",
+      "rsiPeriod": 14,
+      "emaFast": 12,
+      "emaSlow": 26,
+      "tpPips": 35,
+      "slPips": 20,
+      "lastScanPrice": 1.27164,
+      "lastScanTime": "2026-08-12T19:57:56.333Z"
+    },
+    {
+      "id": "xauusd",
+      "symbol": "XAUUSD",
+      "name": "Gold / US Dollar",
+      "timeframe": "5m",
+      "lotSize": 0.1,
+      "enabled": true,
+      "totalPnL": 956.5,
+      "winCount": 20,
+      "lossCount": 8,
+      "winRate": 71.4,
+      "strategy": "Scalp RSI Oversold",
+      "rsiPeriod": 7,
+      "emaFast": 5,
+      "emaSlow": 15,
+      "tpPips": 40,
+      "slPips": 25,
+      "lastScanPrice": 2384.35,
+      "lastScanTime": "2026-08-12T19:57:56.384Z"
+    },
+    {
+      "id": "btcusd",
+      "symbol": "BTCUSD",
+      "name": "Bitcoin / US Dollar",
+      "timeframe": "4h",
+      "lotSize": 0.05,
+      "enabled": false,
+      "totalPnL": -120.3,
+      "winCount": 3,
+      "lossCount": 5,
+      "winRate": 37.5,
+      "strategy": "MACD Trend Follow",
+      "rsiPeriod": 14,
+      "emaFast": 12,
+      "emaSlow": 26,
+      "tpPips": 150,
+      "slPips": 80,
+      "lastScanPrice": 64200,
+      "lastScanTime": "2026-08-12T19:54:11.006Z"
+    },
+    {
+      "id": "us30",
+      "symbol": "US30",
+      "name": "Dow Jones Industrial Average",
+      "timeframe": "15m",
+      "lotSize": 0.2,
+      "enabled": true,
+      "totalPnL": 836.74,
+      "winCount": 17,
+      "lossCount": 6,
+      "winRate": 73.9,
+      "strategy": "NY Session Breakout",
+      "rsiPeriod": 14,
+      "emaFast": 9,
+      "emaSlow": 21,
+      "tpPips": 60,
+      "slPips": 30,
+      "lastScanPrice": 39454.04,
+      "lastScanTime": "2026-08-12T19:57:56.478Z"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "scen-1786564676480",
+      "timestamp": "2026-08-12T19:57:56.480Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:57:56.480Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:57:56.509Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:57:56.511Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:57:56.563Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 39454.04,
+      "sl": 39484.04,
+      "tp": 39394.04,
+      "lotSize": 0.2,
+      "pnl": 71.68,
+      "session": "New York",
+      "rsi": 76.4,
+      "emaFast": 39454.04,
+      "emaSlow": 39455.07368708413,
+      "notes": "RSI Overbought (76.4) + EMA Cross Down on 15m",
+      "orderId": "SIM-712576",
+      "exitPrice": 39394.04,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564676385",
+      "timestamp": "2026-08-12T19:57:56.385Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:57:56.385Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:57:56.387Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:57:56.430Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:57:56.470Z"
+        }
+      ],
+      "symbol": "XAUUSD",
+      "timeframe": "5m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 2384.35,
+      "sl": 2359.35,
+      "tp": 2424.35,
+      "lotSize": 0.1,
+      "pnl": 36.13,
+      "session": "New York",
+      "rsi": 28.1,
+      "emaFast": 2384.35,
+      "emaSlow": 2384.569979573523,
+      "notes": "RSI Oversold (28.1) + EMA Cross Up on 5m",
+      "orderId": "SIM-182081",
+      "exitPrice": 2424.35,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564646519",
+      "timestamp": "2026-08-12T19:57:26.519Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:57:26.519Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:57:26.594Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:57:26.596Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "ORDER_EXECUTED",
+      "price": 39456.47,
+      "sl": 39426.47,
+      "tp": 39516.47,
+      "lotSize": 0.2,
+      "pnl": 0,
+      "session": "New York",
+      "rsi": 27.8,
+      "emaFast": 39456.47,
+      "emaSlow": 39458.98771924808,
+      "notes": "RSI Oversold (27.8) + EMA Cross Up on 15m",
+      "orderId": "SIM-775037"
+    },
+    {
+      "id": "scen-1786564646385",
+      "timestamp": "2026-08-12T19:57:26.385Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:57:26.385Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:57:26.443Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:57:26.466Z"
+        }
+      ],
+      "symbol": "XAUUSD",
+      "timeframe": "5m",
+      "signalType": "SELL",
+      "status": "ORDER_EXECUTED",
+      "price": 2383.55,
+      "sl": 2408.55,
+      "tp": 2343.55,
+      "lotSize": 0.1,
+      "pnl": 0,
+      "session": "New York",
+      "rsi": 73.7,
+      "emaFast": 2383.55,
+      "emaSlow": 2384.5295774852193,
+      "notes": "RSI Overbought (73.7) + EMA Cross Down on 5m",
+      "orderId": "SIM-393942"
+    },
+    {
+      "id": "scen-1786564616571",
+      "timestamp": "2026-08-12T19:56:56.571Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:56.571Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:56.619Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:56.649Z"
+        }
+      ],
+      "symbol": "XAUUSD",
+      "timeframe": "5m",
+      "signalType": "SELL",
+      "status": "ORDER_EXECUTED",
+      "price": 2384.61,
+      "sl": 2409.61,
+      "tp": 2344.61,
+      "lotSize": 0.1,
+      "pnl": 0,
+      "session": "New York",
+      "rsi": 76.1,
+      "emaFast": 2384.61,
+      "emaSlow": 2383.5040726408447,
+      "notes": "RSI Overbought (76.1) + EMA Cross Down on 5m",
+      "orderId": "SIM-152654"
+    },
+    {
+      "id": "scen-1786564616428",
+      "timestamp": "2026-08-12T19:56:56.428Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:56.428Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:56.469Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:56.470Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:57:26.353Z"
+        }
+      ],
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 1.27204,
+      "sl": 1.27,
+      "tp": 1.2755,
+      "lotSize": 0.25,
+      "pnl": 99.53,
+      "session": "New York",
+      "rsi": 26,
+      "emaFast": 1.27204,
+      "emaSlow": 1.272392146237396,
+      "notes": "RSI Oversold (26) + EMA Cross Up on 1h",
+      "orderId": "SIM-629515",
+      "exitPrice": 1.2755,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564616295",
+      "timestamp": "2026-08-12T19:56:56.295Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:56.295Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:56.319Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:56.320Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:56.355Z"
+        }
+      ],
+      "symbol": "EURUSD",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.09238,
+      "sl": 1.0939,
+      "tp": 1.0899,
+      "lotSize": 0.5,
+      "pnl": 183.79,
+      "session": "New York",
+      "rsi": 72.6,
+      "emaFast": 1.09238,
+      "emaSlow": 1.0928628764660595,
+      "notes": "RSI Overbought (72.6) + EMA Cross Down on 15m",
+      "orderId": "SIM-442945",
+      "exitPrice": 1.0899,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564586295",
+      "timestamp": "2026-08-12T19:56:26.295Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:26.295Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:26.296Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:26.297Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "ORDER_EXECUTED",
+      "price": 39440.15,
+      "sl": 39470.15,
+      "tp": 39380.15,
+      "lotSize": 0.2,
+      "pnl": 0,
+      "session": "New York",
+      "rsi": 75.9,
+      "emaFast": 39440.15,
+      "emaSlow": 39423.84511332547,
+      "notes": "RSI Overbought (75.9) + EMA Cross Down on 15m",
+      "orderId": "SIM-745279"
+    },
+    {
+      "id": "scen-1786564586284",
+      "timestamp": "2026-08-12T19:56:26.284Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:26.284Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:26.285Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:26.286Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:26.288Z"
+        }
+      ],
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.27201,
+      "sl": 1.274,
+      "tp": 1.2685,
+      "lotSize": 0.25,
+      "pnl": 71.83,
+      "session": "New York",
+      "rsi": 34.4,
+      "emaFast": 1.27201,
+      "emaSlow": 1.2717458580225547,
+      "notes": "Momentum breakout confirmed on 1h candle close",
+      "orderId": "SIM-839986",
+      "exitPrice": 1.2685,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564571318",
+      "timestamp": "2026-08-12T19:56:11.318Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:56:11.318Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:56:11.342Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:56:11.343Z"
+        },
+        {
+          "status": "CLOSED_LOSS",
+          "timestamp": "2026-08-12T19:56:56.729Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_LOSS",
+      "price": 39455.47,
+      "sl": 39485.47,
+      "tp": 39395.47,
+      "lotSize": 0.2,
+      "pnl": -43.03,
+      "session": "New York",
+      "rsi": 72.4,
+      "emaFast": 39455.47,
+      "emaSlow": 39473.528161261245,
+      "notes": "RSI Overbought (72.4) + EMA Cross Down on 15m",
+      "orderId": "SIM-149479",
+      "exitPrice": 39485.47,
+      "pnlPips": -20
+    },
+    {
+      "id": "scen-1786564556300",
+      "timestamp": "2026-08-12T19:55:56.300Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:56.300Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:56.347Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:56.349Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:26.299Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 39451.81,
+      "sl": 39421.81,
+      "tp": 39511.81,
+      "lotSize": 0.2,
+      "pnl": 70.57,
+      "session": "New York",
+      "rsi": 28.5,
+      "emaFast": 39451.81,
+      "emaSlow": 39469.69577868923,
+      "notes": "RSI Oversold (28.5) + EMA Cross Up on 15m",
+      "orderId": "SIM-764004",
+      "exitPrice": 39511.81,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564526400",
+      "timestamp": "2026-08-12T19:55:26.400Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:26.400Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:26.404Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:26.405Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:55:56.395Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 39450.89,
+      "sl": 39420.89,
+      "tp": 39510.89,
+      "lotSize": 0.2,
+      "pnl": 82.61,
+      "session": "New York",
+      "rsi": 25.1,
+      "emaFast": 39450.89,
+      "emaSlow": 39451.15979769384,
+      "notes": "RSI Oversold (25.1) + EMA Cross Up on 15m",
+      "orderId": "SIM-604643",
+      "exitPrice": 39510.89,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564526238",
+      "timestamp": "2026-08-12T19:55:26.238Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:26.238Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:26.245Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:26.248Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:55:26.252Z"
+        }
+      ],
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.27111,
+      "sl": 1.2731,
+      "tp": 1.2676,
+      "lotSize": 0.25,
+      "pnl": 87.75,
+      "session": "New York",
+      "rsi": 70.8,
+      "emaFast": 1.27111,
+      "emaSlow": 1.2705023573736263,
+      "notes": "RSI Overbought (70.8) + EMA Cross Down on 1h",
+      "orderId": "SIM-515194",
+      "exitPrice": 1.2676,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564526228",
+      "timestamp": "2026-08-12T19:55:26.228Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:26.228Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:26.231Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:26.233Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:11.261Z"
+        }
+      ],
+      "symbol": "EURUSD",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.09219,
+      "sl": 1.0937,
+      "tp": 1.0897,
+      "lotSize": 0.5,
+      "pnl": 172.03,
+      "session": "New York",
+      "rsi": 71.6,
+      "emaFast": 1.09219,
+      "emaSlow": 1.0921384806940706,
+      "notes": "RSI Overbought (71.6) + EMA Cross Down on 15m",
+      "orderId": "SIM-867998",
+      "exitPrice": 1.0897,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564511334",
+      "timestamp": "2026-08-12T19:55:11.334Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:11.334Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:11.362Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:11.363Z"
+        },
+        {
+          "status": "CLOSED_LOSS",
+          "timestamp": "2026-08-12T19:56:41.365Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_LOSS",
+      "price": 39433.22,
+      "sl": 39463.22,
+      "tp": 39373.22,
+      "lotSize": 0.2,
+      "pnl": -36.1,
+      "session": "New York",
+      "rsi": 76.4,
+      "emaFast": 39433.22,
+      "emaSlow": 39441.2245628308,
+      "notes": "RSI Overbought (76.4) + EMA Cross Down on 15m",
+      "orderId": "SIM-111805",
+      "exitPrice": 39463.22,
+      "pnlPips": -20
+    },
+    {
+      "id": "scen-1786564511202",
+      "timestamp": "2026-08-12T19:55:11.202Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:11.202Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:11.231Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:11.252Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:56.501Z"
+        }
+      ],
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 1.27114,
+      "sl": 1.2691,
+      "tp": 1.2746,
+      "lotSize": 0.25,
+      "pnl": 90.71,
+      "session": "New York",
+      "rsi": 27.9,
+      "emaFast": 1.27114,
+      "emaSlow": 1.2710965976011697,
+      "notes": "RSI Oversold (27.9) + EMA Cross Up on 1h",
+      "orderId": "SIM-317742",
+      "exitPrice": 1.2746,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564511129",
+      "timestamp": "2026-08-12T19:55:11.129Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:55:11.129Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:55:11.148Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:55:11.149Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:56:26.278Z"
+        }
+      ],
+      "symbol": "EURUSD",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.09227,
+      "sl": 1.0938,
+      "tp": 1.0898,
+      "lotSize": 0.5,
+      "pnl": 157.32,
+      "session": "New York",
+      "rsi": 74.7,
+      "emaFast": 1.09227,
+      "emaSlow": 1.0925284647812394,
+      "notes": "RSI Overbought (74.7) + EMA Cross Down on 15m",
+      "orderId": "SIM-655265",
+      "exitPrice": 1.0898,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564496155",
+      "timestamp": "2026-08-12T19:54:56.155Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:54:56.155Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:54:56.182Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:54:56.183Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:55:41.253Z"
+        }
+      ],
+      "symbol": "XAUUSD",
+      "timeframe": "5m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 2384.34,
+      "sl": 2359.34,
+      "tp": 2424.34,
+      "lotSize": 0.1,
+      "pnl": 30.37,
+      "session": "New York",
+      "rsi": 30.8,
+      "emaFast": 2384.34,
+      "emaSlow": 2384.381325568744,
+      "notes": "RSI Oversold (30.8) + EMA Cross Up on 5m",
+      "orderId": "SIM-268089",
+      "exitPrice": 2424.34,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564481139",
+      "timestamp": "2026-08-12T19:54:41.139Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:54:41.139Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:54:41.148Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:54:41.151Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:55:11.396Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 39434.82,
+      "sl": 39464.82,
+      "tp": 39374.82,
+      "lotSize": 0.2,
+      "pnl": 66.37,
+      "session": "New York",
+      "rsi": 69.7,
+      "emaFast": 39434.82,
+      "emaSlow": 39443.95418419776,
+      "notes": "RSI Overbought (69.7) + EMA Cross Down on 15m",
+      "orderId": "SIM-967278",
+      "exitPrice": 39374.82,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564466132",
+      "timestamp": "2026-08-12T19:54:26.132Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:54:26.132Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:54:26.156Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:54:26.162Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:54:56.185Z"
+        }
+      ],
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 39439.13,
+      "sl": 39409.13,
+      "tp": 39499.13,
+      "lotSize": 0.2,
+      "pnl": 58.29,
+      "session": "New York",
+      "rsi": 31.2,
+      "emaFast": 39439.13,
+      "emaSlow": 39422.968859707544,
+      "notes": "RSI Oversold (31.2) + EMA Cross Up on 15m",
+      "orderId": "SIM-981299",
+      "exitPrice": 39499.13,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1786564466064",
+      "timestamp": "2026-08-12T19:54:26.064Z",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:54:26.064Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:54:26.066Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:54:26.099Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:55:26.255Z"
+        }
+      ],
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 1.27142,
+      "sl": 1.2734,
+      "tp": 1.2679,
+      "lotSize": 0.25,
+      "pnl": 104.07,
+      "session": "New York",
+      "rsi": 68.7,
+      "emaFast": 1.27142,
+      "emaSlow": 1.2712721541773004,
+      "notes": "RSI Overbought (68.7) + EMA Cross Down on 1h",
+      "orderId": "SIM-172481",
+      "exitPrice": 1.2679,
+      "pnlPips": 30
+    },
+    {
+      "id": "scen-1001",
+      "timestamp": "2026-08-12T19:09:11.006Z",
+      "symbol": "EURUSD",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 1.0918,
+      "exitPrice": 1.09245,
+      "sl": 1.0903,
+      "tp": 1.09245,
+      "lotSize": 0.5,
+      "pnl": 325,
+      "pnlPips": 25,
+      "session": "London",
+      "rsi": 31.4,
+      "emaFast": 1.09175,
+      "emaSlow": 1.0915,
+      "notes": "RSI Oversold + EMA 9 cross above 21 during London open.",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:09:11.006Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:10:11.006Z"
+        },
+        {
+          "status": "FILLED",
+          "timestamp": "2026-08-12T19:11:11.006Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:39:11.006Z"
+        }
+      ]
+    },
+    {
+      "id": "scen-1002",
+      "timestamp": "2026-08-12T17:54:11.006Z",
+      "symbol": "XAUUSD",
+      "timeframe": "5m",
+      "signalType": "SELL",
+      "status": "CLOSED_WIN",
+      "price": 2392.1,
+      "exitPrice": 2388.1,
+      "sl": 2394.6,
+      "tp": 2388.1,
+      "lotSize": 0.1,
+      "pnl": 400,
+      "pnlPips": 40,
+      "session": "New York",
+      "rsi": 74.8,
+      "emaFast": 2391.8,
+      "emaSlow": 2392.5,
+      "notes": "RSI Overbought rejection at resistance near NY session start.",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T17:54:11.006Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T17:55:11.006Z"
+        },
+        {
+          "status": "FILLED",
+          "timestamp": "2026-08-12T17:56:11.006Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T18:54:11.006Z"
+        }
+      ]
+    },
+    {
+      "id": "scen-1003",
+      "timestamp": "2026-08-12T16:34:11.006Z",
+      "symbol": "GBPUSD",
+      "timeframe": "1h",
+      "signalType": "BUY",
+      "status": "CLOSED_LOSS",
+      "price": 1.274,
+      "exitPrice": 1.272,
+      "sl": 1.272,
+      "tp": 1.2775,
+      "lotSize": 0.25,
+      "pnl": -50,
+      "pnlPips": -20,
+      "session": "Asian",
+      "rsi": 48.2,
+      "emaFast": 1.2739,
+      "emaSlow": 1.2738,
+      "notes": "Weak volume consolidation breakout during Asian session.",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T16:34:11.006Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T16:35:11.006Z"
+        },
+        {
+          "status": "FILLED",
+          "timestamp": "2026-08-12T16:36:11.006Z"
+        },
+        {
+          "status": "CLOSED_LOSS",
+          "timestamp": "2026-08-12T17:34:11.006Z"
+        }
+      ]
+    },
+    {
+      "id": "scen-1004",
+      "timestamp": "2026-08-12T19:44:11.006Z",
+      "symbol": "US30",
+      "timeframe": "15m",
+      "signalType": "BUY",
+      "status": "CLOSED_WIN",
+      "price": 39420,
+      "exitPrice": 39480,
+      "sl": 39390,
+      "tp": 39480,
+      "lotSize": 0.2,
+      "pnl": 56.35,
+      "pnlPips": 30,
+      "session": "New York",
+      "rsi": 58.6,
+      "emaFast": 39415,
+      "emaSlow": 39380,
+      "notes": "NY session momentum push higher.",
+      "statusTimeline": [
+        {
+          "status": "SIGNAL_GENERATED",
+          "timestamp": "2026-08-12T19:44:11.006Z"
+        },
+        {
+          "status": "ORDER_PLACED",
+          "timestamp": "2026-08-12T19:45:11.006Z"
+        },
+        {
+          "status": "ORDER_EXECUTED",
+          "timestamp": "2026-08-12T19:46:11.006Z"
+        },
+        {
+          "status": "CLOSED_WIN",
+          "timestamp": "2026-08-12T19:54:41.153Z"
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "id": 62,
+      "timestamp": "2026-08-12T19:57:56.587Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564676480 -> CLOSED_WIN",
+      "details": "PnL: $71.68"
+    },
+    {
+      "id": 61,
+      "timestamp": "2026-08-12T19:57:56.535Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.2 lots US30 @ 39454.04",
+      "details": "Order ID: SIM-712576 (Simulation mode)"
+    },
+    {
+      "id": 60,
+      "timestamp": "2026-08-12T19:57:56.481Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL US30 on 15m",
+      "details": "RSI Overbought (76.4) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 59,
+      "timestamp": "2026-08-12T19:57:56.472Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] XAUUSD scenario scen-1786564676385 -> CLOSED_WIN",
+      "details": "PnL: $36.13"
+    },
+    {
+      "id": 58,
+      "timestamp": "2026-08-12T19:57:56.469Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.1 lots XAUUSD @ 2384.35",
+      "details": "Order ID: SIM-182081 (Simulation mode)"
+    },
+    {
+      "id": 57,
+      "timestamp": "2026-08-12T19:57:56.386Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY XAUUSD on 5m",
+      "details": "RSI Oversold (28.1) + EMA Cross Up on 5m"
+    },
+    {
+      "id": 56,
+      "timestamp": "2026-08-12T19:57:26.633Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.2 lots US30 @ 39456.47",
+      "details": "Order ID: SIM-775037 (Simulation mode)"
+    },
+    {
+      "id": 55,
+      "timestamp": "2026-08-12T19:57:26.551Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY US30 on 15m",
+      "details": "RSI Oversold (27.8) + EMA Cross Up on 15m"
+    },
+    {
+      "id": 54,
+      "timestamp": "2026-08-12T19:57:26.496Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.1 lots XAUUSD @ 2383.55",
+      "details": "Order ID: SIM-393942 (Simulation mode)"
+    },
+    {
+      "id": 53,
+      "timestamp": "2026-08-12T19:57:26.415Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL XAUUSD on 5m",
+      "details": "RSI Overbought (73.7) + EMA Cross Down on 5m"
+    },
+    {
+      "id": 52,
+      "timestamp": "2026-08-12T19:57:26.354Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] GBPUSD scenario scen-1786564616428 -> CLOSED_WIN",
+      "details": "PnL: $99.53"
+    },
+    {
+      "id": 51,
+      "timestamp": "2026-08-12T19:56:56.754Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564571318 -> CLOSED_LOSS",
+      "details": "PnL: $-43.03"
+    },
+    {
+      "id": 50,
+      "timestamp": "2026-08-12T19:56:56.704Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.1 lots XAUUSD @ 2384.61",
+      "details": "Order ID: SIM-152654 (Simulation mode)"
+    },
+    {
+      "id": 49,
+      "timestamp": "2026-08-12T19:56:56.595Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL XAUUSD on 5m",
+      "details": "RSI Overbought (76.1) + EMA Cross Down on 5m"
+    },
+    {
+      "id": 48,
+      "timestamp": "2026-08-12T19:56:56.528Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] GBPUSD scenario scen-1786564511202 -> CLOSED_WIN",
+      "details": "PnL: $90.71"
+    },
+    {
+      "id": 47,
+      "timestamp": "2026-08-12T19:56:56.471Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.25 lots GBPUSD @ 1.27204",
+      "details": "Order ID: SIM-629515 (Simulation mode)"
+    },
+    {
+      "id": 46,
+      "timestamp": "2026-08-12T19:56:56.448Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY GBPUSD on 1h",
+      "details": "RSI Oversold (26) + EMA Cross Up on 1h"
+    },
+    {
+      "id": 45,
+      "timestamp": "2026-08-12T19:56:56.381Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] EURUSD scenario scen-1786564616295 -> CLOSED_WIN",
+      "details": "PnL: $183.79"
+    },
+    {
+      "id": 44,
+      "timestamp": "2026-08-12T19:56:56.321Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.5 lots EURUSD @ 1.09238",
+      "details": "Order ID: SIM-442945 (Simulation mode)"
+    },
+    {
+      "id": 43,
+      "timestamp": "2026-08-12T19:56:56.318Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL EURUSD on 15m",
+      "details": "RSI Overbought (72.6) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 42,
+      "timestamp": "2026-08-12T19:56:41.386Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564511334 -> CLOSED_LOSS",
+      "details": "PnL: $-36.1"
+    },
+    {
+      "id": 41,
+      "timestamp": "2026-08-12T19:56:26.300Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564556300 -> CLOSED_WIN",
+      "details": "PnL: $70.57"
+    },
+    {
+      "id": 40,
+      "timestamp": "2026-08-12T19:56:26.298Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.2 lots US30 @ 39440.15",
+      "details": "Order ID: SIM-745279 (Simulation mode)"
+    },
+    {
+      "id": 39,
+      "timestamp": "2026-08-12T19:56:26.295Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL US30 on 15m",
+      "details": "RSI Overbought (75.9) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 38,
+      "timestamp": "2026-08-12T19:56:26.289Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] GBPUSD scenario scen-1786564586284 -> CLOSED_WIN",
+      "details": "PnL: $71.83"
+    },
+    {
+      "id": 37,
+      "timestamp": "2026-08-12T19:56:26.287Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.25 lots GBPUSD @ 1.27201",
+      "details": "Order ID: SIM-839986 (Simulation mode)"
+    },
+    {
+      "id": 36,
+      "timestamp": "2026-08-12T19:56:26.285Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL GBPUSD on 1h",
+      "details": "Momentum breakout confirmed on 1h candle close"
+    },
+    {
+      "id": 35,
+      "timestamp": "2026-08-12T19:56:26.282Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] EURUSD scenario scen-1786564511129 -> CLOSED_WIN",
+      "details": "PnL: $157.32"
+    },
+    {
+      "id": 34,
+      "timestamp": "2026-08-12T19:56:11.344Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.2 lots US30 @ 39455.47",
+      "details": "Order ID: SIM-149479 (Simulation mode)"
+    },
+    {
+      "id": 33,
+      "timestamp": "2026-08-12T19:56:11.341Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL US30 on 15m",
+      "details": "RSI Overbought (72.4) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 32,
+      "timestamp": "2026-08-12T19:56:11.281Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] EURUSD scenario scen-1786564526228 -> CLOSED_WIN",
+      "details": "PnL: $172.03"
+    },
+    {
+      "id": 31,
+      "timestamp": "2026-08-12T19:55:56.396Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564526400 -> CLOSED_WIN",
+      "details": "PnL: $82.61"
+    },
+    {
+      "id": 30,
+      "timestamp": "2026-08-12T19:55:56.370Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.2 lots US30 @ 39451.81",
+      "details": "Order ID: SIM-764004 (Simulation mode)"
+    },
+    {
+      "id": 29,
+      "timestamp": "2026-08-12T19:55:56.318Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY US30 on 15m",
+      "details": "RSI Oversold (28.5) + EMA Cross Up on 15m"
+    },
+    {
+      "id": 28,
+      "timestamp": "2026-08-12T19:55:41.273Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] XAUUSD scenario scen-1786564496155 -> CLOSED_WIN",
+      "details": "PnL: $30.37"
+    },
+    {
+      "id": 27,
+      "timestamp": "2026-08-12T19:55:26.413Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.2 lots US30 @ 39450.89",
+      "details": "Order ID: SIM-604643 (Simulation mode)"
+    },
+    {
+      "id": 26,
+      "timestamp": "2026-08-12T19:55:26.401Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY US30 on 15m",
+      "details": "RSI Oversold (25.1) + EMA Cross Up on 15m"
+    },
+    {
+      "id": 25,
+      "timestamp": "2026-08-12T19:55:26.398Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] GBPUSD scenario scen-1786564466064 -> CLOSED_WIN",
+      "details": "PnL: $104.07"
+    },
+    {
+      "id": 24,
+      "timestamp": "2026-08-12T19:55:26.254Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] GBPUSD scenario scen-1786564526238 -> CLOSED_WIN",
+      "details": "PnL: $87.75"
+    },
+    {
+      "id": 23,
+      "timestamp": "2026-08-12T19:55:26.250Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.25 lots GBPUSD @ 1.27111",
+      "details": "Order ID: SIM-515194 (Simulation mode)"
+    },
+    {
+      "id": 22,
+      "timestamp": "2026-08-12T19:55:26.244Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL GBPUSD on 1h",
+      "details": "RSI Overbought (70.8) + EMA Cross Down on 1h"
+    },
+    {
+      "id": 21,
+      "timestamp": "2026-08-12T19:55:26.234Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.5 lots EURUSD @ 1.09219",
+      "details": "Order ID: SIM-867998 (Simulation mode)"
+    },
+    {
+      "id": 20,
+      "timestamp": "2026-08-12T19:55:26.230Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL EURUSD on 15m",
+      "details": "RSI Overbought (71.6) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 19,
+      "timestamp": "2026-08-12T19:55:11.397Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564481139 -> CLOSED_WIN",
+      "details": "PnL: $66.37"
+    },
+    {
+      "id": 18,
+      "timestamp": "2026-08-12T19:55:11.395Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.2 lots US30 @ 39433.22",
+      "details": "Order ID: SIM-111805 (Simulation mode)"
+    },
+    {
+      "id": 17,
+      "timestamp": "2026-08-12T19:55:11.335Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL US30 on 15m",
+      "details": "RSI Overbought (76.4) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 16,
+      "timestamp": "2026-08-12T19:55:11.282Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.25 lots GBPUSD @ 1.27114",
+      "details": "Order ID: SIM-317742 (Simulation mode)"
+    },
+    {
+      "id": 15,
+      "timestamp": "2026-08-12T19:55:11.230Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY GBPUSD on 1h",
+      "details": "RSI Oversold (27.9) + EMA Cross Up on 1h"
+    },
+    {
+      "id": 14,
+      "timestamp": "2026-08-12T19:55:11.149Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.5 lots EURUSD @ 1.09227",
+      "details": "Order ID: SIM-655265 (Simulation mode)"
+    },
+    {
+      "id": 13,
+      "timestamp": "2026-08-12T19:55:11.130Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL EURUSD on 15m",
+      "details": "RSI Overbought (74.7) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 12,
+      "timestamp": "2026-08-12T19:54:56.186Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1786564466132 -> CLOSED_WIN",
+      "details": "PnL: $58.29"
+    },
+    {
+      "id": 11,
+      "timestamp": "2026-08-12T19:54:56.184Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.1 lots XAUUSD @ 2384.34",
+      "details": "Order ID: SIM-268089 (Simulation mode)"
+    },
+    {
+      "id": 10,
+      "timestamp": "2026-08-12T19:54:56.155Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY XAUUSD on 5m",
+      "details": "RSI Oversold (30.8) + EMA Cross Up on 5m"
+    },
+    {
+      "id": 9,
+      "timestamp": "2026-08-12T19:54:41.155Z",
+      "level": "INFO",
+      "message": "[TRADE CLOSED] US30 scenario scen-1004 -> CLOSED_WIN",
+      "details": "PnL: $56.35"
+    },
+    {
+      "id": 8,
+      "timestamp": "2026-08-12T19:54:41.152Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.2 lots US30 @ 39434.82",
+      "details": "Order ID: SIM-967278 (Simulation mode)"
+    },
+    {
+      "id": 7,
+      "timestamp": "2026-08-12T19:54:41.140Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL US30 on 15m",
+      "details": "RSI Overbought (69.7) + EMA Cross Down on 15m"
+    },
+    {
+      "id": 6,
+      "timestamp": "2026-08-12T19:54:26.183Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] BUY 0.2 lots US30 @ 39439.13",
+      "details": "Order ID: SIM-981299 (Simulation mode)"
+    },
+    {
+      "id": 5,
+      "timestamp": "2026-08-12T19:54:26.133Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] BUY US30 on 15m",
+      "details": "RSI Oversold (31.2) + EMA Cross Up on 15m"
+    },
+    {
+      "id": 4,
+      "timestamp": "2026-08-12T19:54:26.130Z",
+      "level": "EXECUTION",
+      "message": "[ORDER EXECUTED] SELL 0.25 lots GBPUSD @ 1.27142",
+      "details": "Order ID: SIM-172481 (Simulation mode)"
+    },
+    {
+      "id": 3,
+      "timestamp": "2026-08-12T19:54:26.065Z",
+      "level": "SIGNAL",
+      "message": "[SIGNAL] SELL GBPUSD on 1h",
+      "details": "RSI Overbought (68.7) + EMA Cross Down on 1h"
+    },
+    {
+      "id": 2,
+      "timestamp": "2026-08-12T19:54:11.032Z",
+      "level": "INFO",
+      "message": "Bot Engine started scanning configured assets.",
+      "details": "Mode: Simulation"
+    },
+    {
+      "id": 1,
+      "timestamp": "2026-08-12T19:54:11.006Z",
+      "level": "INFO",
+      "message": "Bot Engine initialized. Scanning 4 active assets across timeframes.",
+      "details": "TradeLocker server connected in Simulation Mode."
+    }
+  ],
+  "botState": {
+    "isRunning": true,
+    "mode": "Simulation",
+    "scanIntervalSeconds": 15,
+    "lastGlobalScan": "2026-08-12T19:57:56.326Z"
+  }
+}
