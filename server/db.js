@@ -24,7 +24,7 @@ const defaultData = {
       totalPnL: 0.93,
       winRate: 100.0,
       totalTrades: 3,
-      status: 'Connected Live (Active)'
+      status: 'Connected Live (HeroFX API Active)'
     }
   ],
   assets: [
@@ -105,7 +105,7 @@ const defaultData = {
       pnl: 0.71,
       session: 'New York',
       rsi: 62.4,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     },
     {
       id: 'scen-812189-2',
@@ -122,7 +122,7 @@ const defaultData = {
       pnl: 0.08,
       session: 'New York',
       rsi: 58.1,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     },
     {
       id: 'scen-812189-3',
@@ -139,7 +139,7 @@ const defaultData = {
       pnl: 0.14,
       session: 'London',
       rsi: 42.5,
-      notes: 'Live position on account 812189'
+      notes: 'Live open position on account 812189'
     }
   ],
   logs: [
@@ -171,16 +171,6 @@ class DataStore {
         const raw = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(raw);
         this.data = parsed;
-
-        // Reset EURUSD totalPnL if negative from previous mock cycle
-        const eurusd = this.data.assets?.find(a => a.symbol === 'EURUSD');
-        if (eurusd && eurusd.totalPnL < 0) {
-          eurusd.totalPnL = 0.14;
-          eurusd.winCount = 1;
-          eurusd.lossCount = 0;
-          eurusd.winRate = 100.0;
-        }
-        this.save();
       } else {
         this.save();
       }
@@ -199,23 +189,19 @@ class DataStore {
   }
 
   async syncLiveAccounts() {
-    if (tradeLockerService.isConnected) {
+    try {
       const realAccounts = await tradeLockerService.fetchAccounts();
       if (realAccounts && realAccounts.length > 0) {
-        this.data.accounts = realAccounts;
-        this.save();
-        return realAccounts;
-      }
-    } else {
-      const auth = await tradeLockerService.authenticate();
-      if (auth.success) {
-        const realAccounts = await tradeLockerService.fetchAccounts();
-        if (realAccounts && realAccounts.length > 0) {
-          this.data.accounts = realAccounts;
+        // Find 812189 account
+        const targetAcc = realAccounts.find(a => String(a.id || a.accNumber).includes('812189')) || realAccounts[0];
+        if (targetAcc) {
+          this.data.accounts = [targetAcc];
           this.save();
-          return realAccounts;
+          return [targetAcc];
         }
       }
+    } catch (err) {
+      console.error('syncLiveAccounts error:', err);
     }
     return this.data.accounts;
   }

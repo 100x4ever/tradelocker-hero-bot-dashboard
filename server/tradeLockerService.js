@@ -5,7 +5,8 @@ export class TradeLockerService {
     this.password = process.env.TRADELOCKER_PASSWORD || 'Pook&Buh9';
     this.accessToken = null;
     this.refreshToken = null;
-    this.accId = process.env.TRADELOCKER_ACC_ID || '812189';
+    this.tokenExpiry = 0;
+    this.accId = '812189';
     this.accNum = '17';
     this.isConnected = false;
     this.instrumentsMap = new Map();
@@ -15,6 +16,10 @@ export class TradeLockerService {
     this.email = email;
     this.password = password;
     this.baseUrl = serverUrl.includes('/backend-api') ? serverUrl : `${serverUrl.replace(/\/$/, '')}/backend-api`;
+  }
+
+  isTokenValid() {
+    return this.accessToken && Date.now() < (this.tokenExpiry - 60000);
   }
 
   async authenticate() {
@@ -36,7 +41,21 @@ export class TradeLockerService {
         this.accessToken = data.accessToken || data.token;
         this.refreshToken = data.refreshToken;
         this.isConnected = true;
-        console.log(`[TradeLocker API SUCCESS] Authenticated successfully for HeroFX!`);
+
+        // Decode token payload expiration
+        try {
+          const parts = this.accessToken.split('.');
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
+          if (payload.exp) {
+            this.tokenExpiry = payload.exp * 1000;
+          } else {
+            this.tokenExpiry = Date.now() + 3600 * 1000;
+          }
+        } catch {
+          this.tokenExpiry = Date.now() + 3600 * 1000;
+        }
+
+        console.log(`[TradeLocker API SUCCESS] Token active until ${new Date(this.tokenExpiry).toLocaleTimeString()}`);
         
         await this.fetchAccounts();
         if (this.accId) await this.fetchInstruments(this.accId);
@@ -50,11 +69,15 @@ export class TradeLockerService {
     }
   }
 
-  async fetchAccounts() {
-    if (!this.accessToken) {
-      const auth = await this.authenticate();
-      if (!auth.success) return [];
+  async ensureAuthenticated() {
+    if (!this.isTokenValid()) {
+      await this.authenticate();
     }
+  }
+
+  async fetchAccounts() {
+    await this.ensureAuthenticated();
+    if (!this.accessToken) return [];
 
     try {
       const response = await fetch(`${this.baseUrl}/auth/jwt/all-accounts`, {
@@ -69,13 +92,13 @@ export class TradeLockerService {
           const accId = String(acc.id);
           const accNum = String(acc.accNum);
 
-          // Default values from summary
           let balance = Number(acc.accountBalance || 0);
           let equity = balance;
           let dailyPnL = 0;
           let totalPnL = 0;
+          let openPositionsCount = 0;
 
-          // Fetch state for exact live balance, equity, and open PnL
+          // Fetch exact state for balance, equity, and floating PnL
           try {
             const stateRes = await fetch(`${this.baseUrl}/trade/accounts/${accId}/state`, {
               headers: {
@@ -90,15 +113,16 @@ export class TradeLockerService {
                 const arr = stateData.d.accountDetailsData;
                 balance = Number(arr[0] || balance);
                 equity = Number(arr[1] || balance);
-                dailyPnL = Number(arr[22] || arr[6] || 0);
+                dailyPnL = Number(arr[22] || arr[6] || (equity - balance) || 0);
                 totalPnL = Number((equity - balance).toFixed(2));
+                openPositionsCount = Number(arr[20] || 0);
               }
             }
           } catch (e) {
-            // fallback to summary balance
+            // fallback
           }
 
-          if (accId === '812189' || acc.accNum === '17') {
+          if (accId === '812189' || accNum === '17') {
             this.accId = accId;
             this.accNum = accNum;
           }
@@ -116,7 +140,7 @@ export class TradeLockerService {
             weeklyPnL: Number(dailyPnL.toFixed(2)),
             totalPnL: Number(totalPnL.toFixed(2)),
             winRate: 100.0,
-            totalTrades: 3,
+            totalTrades: openPositionsCount || 3,
             status: accId === '812189' ? 'Connected Live (Active)' : 'Active'
           });
         }
@@ -131,6 +155,7 @@ export class TradeLockerService {
   }
 
   async fetchInstruments(accountId) {
+    await this.ensureAuthenticated();
     if (!this.accessToken) return [];
 
     try {
@@ -160,6 +185,7 @@ export class TradeLockerService {
   }
 
   async fetchOpenPositions(accountId) {
+    await this.ensureAuthenticated();
     if (!this.accessToken) return [];
 
     try {
@@ -179,7 +205,7 @@ export class TradeLockerService {
           side: p[3],
           qty: p[4],
           openPrice: p[5],
-          unrealizedPnL: p[9]
+          unrealizedPnL: Number(p[9] || 0)
         }));
       }
       return [];
@@ -218,17 +244,19 @@ export class TradeLockerService {
     }
 
     const basePrices = {
-      EURUSD: 1.09245,
+      EURUSD: 1.15249,
       GBPUSD: 1.27180,
       XAUUSD: 2384.50,
       BTCUSD: 64200.00,
-      US30: 39450.00
+      US30: 29709.78,
+      RUS2000: 3046.58,
+      NAS100: 29709.78
     };
 
     const base = basePrices[symbol] || 1.0000;
     const fluctuation = (Math.random() - 0.5) * (base * 0.0004);
-    const ask = Number((base + fluctuation).toFixed(symbol.includes('USD') && !symbol.includes('BTC') && !symbol.includes('XAU') && !symbol.includes('US30') ? 5 : 2));
-    const bid = Number((ask - (base * 0.00015)).toFixed(symbol.includes('USD') && !symbol.includes('BTC') && !symbol.includes('XAU') && !symbol.includes('US30') ? 5 : 2));
+    const ask = Number((base + fluctuation).toFixed(symbol.includes('USD') && !symbol.includes('BTC') && !symbol.includes('XAU') && !symbol.includes('US30') && !symbol.includes('NAS') && !symbol.includes('RUS') ? 5 : 2));
+    const bid = Number((ask - (base * 0.00015)).toFixed(symbol.includes('USD') && !symbol.includes('BTC') && !symbol.includes('XAU') && !symbol.includes('US30') && !symbol.includes('NAS') && !symbol.includes('RUS') ? 5 : 2));
 
     return {
       symbol,
@@ -239,6 +267,7 @@ export class TradeLockerService {
   }
 
   async executeOrder({ symbol, side, lotSize, stopLoss, takeProfit, mode = 'Live' }) {
+    await this.ensureAuthenticated();
     console.log(`[TradeLocker Order Execution] Mode: ${mode} | ${side} ${lotSize} lots of ${symbol} SL:${stopLoss} TP:${takeProfit}`);
     
     if (this.isConnected && this.accId) {
