@@ -15,7 +15,16 @@ export class TradeLockerService {
   setCredentials(email, password, serverUrl = 'https://live.tradelocker.com/backend-api') {
     this.email = email;
     this.password = password;
-    this.baseUrl = serverUrl.includes('/backend-api') ? serverUrl : `${serverUrl.replace(/\/$/, '')}/backend-api`;
+
+    if (serverUrl.includes('live.tradelocker.com')) {
+      this.baseUrl = 'https://live.tradelocker.com/backend-api';
+    } else if (serverUrl.includes('demo.tradelocker.com')) {
+      this.baseUrl = 'https://demo.tradelocker.com/backend-api';
+    } else {
+      // Strip trailing /api/v2 or trailing slashes
+      const cleaned = serverUrl.replace(/\/api\/v2\/?$/, '').replace(/\/$/, '');
+      this.baseUrl = cleaned.endsWith('/backend-api') ? cleaned : `${cleaned}/backend-api`;
+    }
   }
 
   isTokenValid() {
@@ -36,13 +45,20 @@ export class TradeLockerService {
         })
       });
 
-      const data = await response.json();
+      const rawText = await response.text();
+      let data = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch (e) {
+        console.error('[TradeLocker API Auth Non-JSON Output]:', rawText.substring(0, 200));
+        return { success: false, reason: 'Invalid server response structure' };
+      }
+
       if (response.ok && data && (data.accessToken || data.token)) {
         this.accessToken = data.accessToken || data.token;
         this.refreshToken = data.refreshToken;
         this.isConnected = true;
 
-        // Decode token payload expiration
         try {
           const parts = this.accessToken.split('.');
           const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
@@ -98,7 +114,6 @@ export class TradeLockerService {
           let totalPnL = 0;
           let openPositionsCount = 0;
 
-          // Fetch exact state for balance, equity, and floating PnL
           try {
             const stateRes = await fetch(`${this.baseUrl}/trade/accounts/${accId}/state`, {
               headers: {

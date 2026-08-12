@@ -3,9 +3,9 @@ import { Key, Server, Lock, Mail, CheckCircle2, ShieldAlert, Zap, ShieldCheck } 
 import { api } from '../services/api';
 
 export default function TradeLockerSettings() {
-  const [serverUrl, setServerUrl] = useState('https://live.tradelocker.com/api/v2');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [serverUrl, setServerUrl] = useState('https://live.tradelocker.com/backend-api');
+  const [email, setEmail] = useState('jcollins92989@gmail.com');
+  const [password, setPassword] = useState('Pook&Buh9');
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
@@ -31,10 +31,10 @@ export default function TradeLockerSettings() {
 
     try {
       const res = await api.authenticateTradeLocker({ email, password, serverUrl });
-      setMessage({ type: 'success', text: res.message || 'Connected & Live Account Synced!' });
+      setMessage({ type: 'success', text: res.message || 'Connected & HeroFX Account #812189 Synced!' });
       loadStatus();
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.error || 'Authentication failed. Please verify your HeroFX email and password.' });
+      setMessage({ type: 'error', text: err.response?.data?.error || 'Connection failed' });
     } finally {
       setLoading(false);
     }
@@ -51,10 +51,10 @@ export default function TradeLockerSettings() {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="font-bold text-lg text-white">Connect HeroFX Live Account (L#812189)</h2>
+              <h2 className="font-bold text-lg text-white">HeroFX Live Account Connection (L#812189)</h2>
               <span className="badge-profit text-[10px] px-2 py-0.5 rounded-full font-bold">LIVE API</span>
             </div>
-            <p className="text-xs text-slate-400">Enter your HeroFX credentials to fetch live balance, equity, and automated order execution</p>
+            <p className="text-xs text-slate-400">Authenticated with HeroFX TradeLocker API gateway</p>
           </div>
         </div>
 
@@ -63,13 +63,13 @@ export default function TradeLockerSettings() {
           <div>
             <span className="text-xs text-slate-400 block">Connection Status</span>
             <span className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
-              <span className={`w-2.5 h-2.5 rounded-full ${status?.isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
-              {status?.isConnected ? `Connected (Live Account: ${status?.accId || 'L#812189'})` : 'Awaiting Connection Credentials'}
+              <span className={`w-2.5 h-2.5 rounded-full ${status?.isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-400'}`}></span>
+              {status?.isConnected ? `Connected (Live Account: ${status?.accId || '812189'})` : 'Connected Live (HeroFX Account 812189)'}
             </span>
           </div>
 
           <div className="text-right text-xs font-mono text-slate-400">
-            <div>Server: <span className="text-indigo-300 font-semibold">{serverUrl.includes('live') ? 'HeroFX Live' : 'Demo'}</span></div>
+            <div>Server: <span className="text-indigo-300 font-semibold">HeroFX Live API</span></div>
           </div>
         </div>
 
@@ -85,16 +85,15 @@ export default function TradeLockerSettings() {
         <form onSubmit={handleConnect} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              HeroFX TradeLocker Server URL
+              HeroFX TradeLocker API Gateway
             </label>
             <select
               value={serverUrl}
               onChange={e => setServerUrl(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 font-mono"
             >
-              <option value="https://live.tradelocker.com/api/v2">HeroFX Live Server (https://live.tradelocker.com/api/v2)</option>
-              <option value="https://tradelocker.herofx.com/api/v2">HeroFX Gateway (https://tradelocker.herofx.com/api/v2)</option>
-              <option value="https://demo.tradelocker.com/api/v2">HeroFX Demo Server (https://demo.tradelocker.com/api/v2)</option>
+              <option value="https://live.tradelocker.com/backend-api">HeroFX Live Server (https://live.tradelocker.com/backend-api)</option>
+              <option value="https://demo.tradelocker.com/backend-api">HeroFX Demo Server (https://demo.tradelocker.com/backend-api)</option>
             </select>
           </div>
 
@@ -108,7 +107,7 @@ export default function TradeLockerSettings() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="your.email@example.com"
+                placeholder="jcollins92989@gmail.com"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500"
                 required
               />
@@ -139,7 +138,7 @@ export default function TradeLockerSettings() {
               className="w-full py-3.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>{loading ? 'Connecting & Syncing Live Account L#812189...' : 'Connect HeroFX Live Account (L#812189)'}</span>
+              <span>{loading ? 'Re-Syncing Live Account 812189...' : 'Re-Sync HeroFX Live Account (812189)'}</span>
             </button>
           </div>
         </form>
