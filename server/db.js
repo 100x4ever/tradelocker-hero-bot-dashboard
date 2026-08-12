@@ -11,10 +11,10 @@ const DB_FILE = path.join(__dirname, 'data_store.json');
 const defaultData = {
   accounts: [
     {
-      id: 'herofx-primary',
-      name: 'HeroFX TradeLocker Account',
+      id: 'herofx-live-812189',
+      name: 'HeroFX Live Account',
       broker: 'HeroFX (TradeLocker)',
-      accNumber: 'Awaiting Connection',
+      accNumber: 'L#812189',
       type: 'Live',
       server: 'https://live.tradelocker.com/api/v2',
       balance: 0.00,
@@ -22,9 +22,9 @@ const defaultData = {
       dailyPnL: 0.00,
       weeklyPnL: 0.00,
       totalPnL: 0.00,
-      winRate: 0,
+      winRate: 0.0,
       totalTrades: 0,
-      status: 'Disconnected (Enter Credentials in Settings)'
+      status: 'Awaiting Live HeroFX Credentials'
     }
   ],
   assets: [
@@ -38,7 +38,7 @@ const defaultData = {
       totalPnL: 0.00,
       winCount: 0,
       lossCount: 0,
-      winRate: 0,
+      winRate: 0.0,
       strategy: 'EMA & RSI Momentum',
       rsiPeriod: 14,
       emaFast: 9,
@@ -58,7 +58,7 @@ const defaultData = {
       totalPnL: 0.00,
       winCount: 0,
       lossCount: 0,
-      winRate: 0,
+      winRate: 0.0,
       strategy: 'Breakout & Trend',
       rsiPeriod: 14,
       emaFast: 12,
@@ -78,7 +78,7 @@ const defaultData = {
       totalPnL: 0.00,
       winCount: 0,
       lossCount: 0,
-      winRate: 0,
+      winRate: 0.0,
       strategy: 'Scalp RSI Oversold',
       rsiPeriod: 7,
       emaFast: 5,
@@ -98,7 +98,7 @@ const defaultData = {
       totalPnL: 0.00,
       winCount: 0,
       lossCount: 0,
-      winRate: 0,
+      winRate: 0.0,
       strategy: 'NY Session Breakout',
       rsiPeriod: 14,
       emaFast: 9,
@@ -115,8 +115,8 @@ const defaultData = {
       id: 1,
       timestamp: new Date().toISOString(),
       level: 'INFO',
-      message: 'System ready. Enter TradeLocker credentials to sync live HeroFX account.',
-      details: 'TradeLocker REST API Engine Initialized.'
+      message: 'System ready for HeroFX Live account L#812189. Enter email/password in Settings.',
+      details: 'TradeLocker REST API Client active.'
     }
   ],
   botState: {
@@ -142,7 +142,7 @@ class DataStore {
         this.save();
       }
     } catch (err) {
-      console.error('Error loading DB file, using defaults:', err);
+      console.error('Error loading DB file, resetting to defaults:', err);
       this.data = defaultData;
     }
   }
