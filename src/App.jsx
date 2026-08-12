@@ -19,7 +19,6 @@ export default function App() {
   const [scenarios, setScenarios] = useState([]);
   const [scenarioAnalytics, setScenarioAnalytics] = useState(null);
   const [logs, setLogs] = useState([]);
-  const [positions, setPositions] = useState([]);
 
   // Asset Config Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,8 +26,8 @@ export default function App() {
 
   useEffect(() => {
     loadAllData();
-    // Fast 3-second live refresh interval
-    const interval = setInterval(loadAllData, 3000);
+    // 6-second live refresh interval
+    const interval = setInterval(loadAllData, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -135,7 +134,7 @@ export default function App() {
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             <span className="font-semibold text-slate-200">Live TradeLocker Auto-Sync</span>
-            <span className="text-slate-500">• Refreshing every 3 seconds</span>
+            <span className="text-slate-500">• Refreshing every 6 seconds</span>
           </div>
           <button 
             onClick={loadAllData}
@@ -240,7 +239,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>TradeLocker & HeroFX Trading Bot App • Railway & GitHub Ready</span>
           <span className="font-mono text-[11px] text-indigo-400/70">
-            3-Sec Live Stream Active
+            6-Sec Live Stream Active
           </span>
         </div>
       </footer>
