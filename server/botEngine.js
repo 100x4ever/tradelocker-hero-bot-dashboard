@@ -11,10 +11,10 @@ export class BotEngine {
     const botState = db.getBotState();
     if (this.timer) clearInterval(this.timer);
 
-    const intervalMs = (botState.scanIntervalSeconds || 15) * 1000;
+    const intervalMs = (botState.scanIntervalSeconds || 3) * 1000;
     this.timer = setInterval(() => this.runScanCycle(), intervalMs);
-    console.log(`[Bot Engine] Scanning service started. Interval: ${botState.scanIntervalSeconds}s`);
-    db.addLog('INFO', 'Bot Engine started scanning configured assets.', `Mode: ${botState.mode}`);
+    console.log(`[Bot Engine] Scanning service started. Interval: ${botState.scanIntervalSeconds || 3}s`);
+    db.addLog('INFO', 'Bot Engine scanner active.', `Mode: ${botState.mode}`);
   }
 
   stop() {
@@ -35,6 +35,9 @@ export class BotEngine {
     db.updateBotState({ lastGlobalScan: new Date().toISOString() });
 
     try {
+      // Sync real TradeLocker positions and metrics
+      await db.syncLiveAccounts();
+
       const assets = db.getAssets().filter(a => a.enabled);
       for (const asset of assets) {
         await this.scanAsset(asset, botState.mode);
@@ -49,19 +52,22 @@ export class BotEngine {
   async scanAsset(asset, mode) {
     const quote = await tradeLockerService.getMarketPrice(asset.symbol);
     
-    // Update asset last scan price
     db.updateAsset(asset.id, {
       lastScanPrice: quote.bid,
       lastScanTime: new Date().toISOString()
     });
 
-    // Evaluate Strategy Math & Technical Indicators
-    // Mock technical indicator analysis based on timeframe and asset strategy
-    const rsi = Number((25 + Math.random() * 52).toFixed(1));
-    const emaFast = quote.bid;
-    const emaSlow = quote.bid * (1 + (Math.random() - 0.5) * 0.001);
+    // In Live mode, only real TradeLocker signals and positions are recorded
+    if (mode === 'Simulation') {
+      await this.processSimulatedAssetScan(asset, quote);
+    }
+  }
 
-    // Signal Trigger conditions
+  async processSimulatedAssetScan(asset, quote) {
+    const rsi = Number((30 + Math.random() * 40).toFixed(1));
+    const emaFast = quote.bid;
+    const emaSlow = quote.bid;
+
     let signalType = null;
     let signalReason = '';
 
@@ -71,108 +77,32 @@ export class BotEngine {
     } else if (rsi > 68) {
       signalType = 'SELL';
       signalReason = `RSI Overbought (${rsi}) + EMA Cross Down on ${asset.timeframe}`;
-    } else if (Math.random() < 0.08) {
-      // Periodic trend momentum signal generator for live demo testing
-      signalType = Math.random() > 0.5 ? 'BUY' : 'SELL';
-      signalReason = `Momentum breakout confirmed on ${asset.timeframe} candle close`;
     }
 
     if (signalType) {
-      await this.handleSignal({
-        asset,
+      const pipsCalc = asset.symbol.includes('JPY') ? 0.01 : (asset.symbol.includes('XAU') || asset.symbol.includes('US') || asset.symbol.includes('BTC') ? 1.0 : 0.0001);
+      const slDist = (asset.slPips || 20) * pipsCalc;
+      const tpDist = (asset.tpPips || 30) * pipsCalc;
+      const price = quote.bid;
+      const sl = signalType === 'BUY' ? Number((price - slDist).toFixed(4)) : Number((price + slDist).toFixed(4));
+      const tp = signalType === 'BUY' ? Number((price + tpDist).toFixed(4)) : Number((price - tpDist).toFixed(4));
+
+      db.addScenario({
+        symbol: asset.symbol,
+        timeframe: asset.timeframe,
         signalType,
-        signalReason,
-        quote,
+        status: 'ORDER_EXECUTED',
+        price,
+        sl,
+        tp,
+        lotSize: asset.lotSize,
+        pnl: 0,
+        session: 'New York',
         rsi,
         emaFast,
         emaSlow,
-        mode
+        notes: signalReason
       });
-    }
-
-    // Check existing open scenarios to simulate SL/TP hit & status updates
-    await this.processOpenScenarios(asset.symbol);
-  }
-
-  async handleSignal({ asset, signalType, signalReason, quote, rsi, emaFast, emaSlow, mode }) {
-    // Current Trading Session detection
-    const hour = new Date().getUTCHours();
-    let session = 'Asian';
-    if (hour >= 7 && hour < 15) session = 'London';
-    if (hour >= 13 && hour < 21) session = 'New York';
-
-    const pipsCalc = asset.symbol.includes('JPY') ? 0.01 : (asset.symbol.includes('XAU') || asset.symbol.includes('US30') || asset.symbol.includes('BTC') ? 1.0 : 0.0001);
-    const slDist = (asset.slPips || 20) * pipsCalc;
-    const tpDist = (asset.tpPips || 30) * pipsCalc;
-
-    const price = quote.bid;
-    const sl = signalType === 'BUY' ? Number((price - slDist).toFixed(4)) : Number((price + slDist).toFixed(4));
-    const tp = signalType === 'BUY' ? Number((price + tpDist).toFixed(4)) : Number((price - tpDist).toFixed(4));
-
-    // 1. Create Scenario with initial status SIGNAL_GENERATED
-    const scenario = db.addScenario({
-      symbol: asset.symbol,
-      timeframe: asset.timeframe,
-      signalType,
-      status: 'SIGNAL_GENERATED',
-      price,
-      sl,
-      tp,
-      lotSize: asset.lotSize,
-      pnl: 0,
-      session,
-      rsi,
-      emaFast,
-      emaSlow,
-      notes: signalReason
-    });
-
-    db.addLog('SIGNAL', `[SIGNAL] ${signalType} ${asset.symbol} on ${asset.timeframe}`, signalReason);
-
-    // 2. Transition status to ORDER_PLACED
-    db.updateScenarioStatus(scenario.id, 'ORDER_PLACED');
-
-    // 3. Execute Order via TradeLocker Service
-    const orderRes = await tradeLockerService.executeOrder({
-      symbol: asset.symbol,
-      side: signalType,
-      lotSize: asset.lotSize,
-      stopLoss: sl,
-      takeProfit: tp,
-      mode
-    });
-
-    if (orderRes.success) {
-      db.updateScenarioStatus(scenario.id, 'ORDER_EXECUTED', { orderId: orderRes.orderId });
-      db.addLog('EXECUTION', `[ORDER EXECUTED] ${signalType} ${asset.lotSize} lots ${asset.symbol} @ ${price}`, `Order ID: ${orderRes.orderId} (${mode} mode)`);
-    } else {
-      db.updateScenarioStatus(scenario.id, 'CANCELLED', { notes: `Execution failed: ${orderRes.error}` });
-      db.addLog('WARN', `Order failed for ${asset.symbol}: ${orderRes.error}`);
-    }
-  }
-
-  async processOpenScenarios(symbol) {
-    const openScenarios = db.getScenarios().filter(s => s.symbol === symbol && ['ORDER_EXECUTED', 'ORDER_PLACED'].includes(s.status));
-    
-    for (const scen of openScenarios) {
-      // Simulate trade duration completion (10% chance per cycle to trigger exit TP/SL)
-      if (Math.random() < 0.25) {
-        const isWin = Math.random() < 0.72; // Win probability reflective of strategy
-        const newStatus = isWin ? 'CLOSED_WIN' : 'CLOSED_LOSS';
-        
-        const pipsMultiplier = symbol.includes('XAU') || symbol.includes('US30') ? 10 : (symbol.includes('BTC') ? 1 : 100);
-        const pnlAmount = isWin 
-          ? Number((scen.lotSize * 350 * (0.8 + Math.random() * 0.4)).toFixed(2)) 
-          : Number((-scen.lotSize * 220 * (0.8 + Math.random() * 0.4)).toFixed(2));
-        
-        db.updateScenarioStatus(scen.id, newStatus, {
-          exitPrice: isWin ? scen.tp : scen.sl,
-          pnl: pnlAmount,
-          pnlPips: isWin ? 30 : -20
-        });
-
-        db.addLog('INFO', `[TRADE CLOSED] ${scen.symbol} scenario ${scen.id} -> ${newStatus}`, `PnL: $${pnlAmount}`);
-      }
     }
   }
 }
